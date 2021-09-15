@@ -780,12 +780,14 @@ class BaseSession(requests.Session):
     @property
     async def browser(self):
         if not hasattr(self, "_browser"):
-            self._browser = await pyppeteer.launch(
-                executablePath=os.environ["CHROMIUM_PATH"],
-                ignoreHTTPSErrors=not(self.verify),
-                headless=True,
-                args=self.__browser_args
-            )
+            options = {
+                "ignoreHTTPSErrors": not(self.verify),
+                "headless": True,
+                "args": self.__browser_args
+            }
+            if "CHROMIUM_PATH" in os.environ.keys():
+                options['executablePath'] = os.environ["CHROMIUM_PATH"]
+            self._browser = await pyppeteer.launch(**options)
 
         return self._browser
 
