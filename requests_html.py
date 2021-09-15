@@ -1,5 +1,6 @@
 import sys
 import asyncio
+import os
 from urllib.parse import urlparse, urlunparse, urljoin
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures._base import TimeoutError
@@ -779,7 +780,12 @@ class BaseSession(requests.Session):
     @property
     async def browser(self):
         if not hasattr(self, "_browser"):
-            self._browser = await pyppeteer.launch(ignoreHTTPSErrors=not(self.verify), headless=True, args=self.__browser_args)
+            self._browser = await pyppeteer.launch(
+                executablePath=os.environ["CHROMIUM_PATH"],
+                ignoreHTTPSErrors=not(self.verify),
+                headless=True,
+                args=self.__browser_args
+            )
 
         return self._browser
 
