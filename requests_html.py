@@ -1,6 +1,7 @@
 import sys
 import asyncio
 import os
+import shutil
 from urllib.parse import urlparse, urlunparse, urljoin
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures._base import TimeoutError
@@ -809,6 +810,11 @@ class HTMLSession(BaseSession):
     def close(self):
         """ If a browser was created close it first. """
         if hasattr(self, "_browser"):
+            process = self._browser.process
+            if process != None:
+                user_data_param = "--user-data-dir="
+                dev_profile = [x.replace(user_data_param, "") for x in process.args if x.startswith(user_data_param)][0]
+                shutil.rmtree(dev_profile)
             self.loop.run_until_complete(self._browser.close())
         super().close()
 
@@ -837,6 +843,11 @@ class AsyncHTMLSession(BaseSession):
     async def close(self):
         """ If a browser was created close it first. """
         if hasattr(self, "_browser"):
+            process = self._browser.process
+            if process != None:
+                user_data_param = "--user-data-dir="
+                dev_profile = [x.replace(user_data_param, "") for x in process.args if x.startswith(user_data_param)][0]
+                shutil.rmtree(dev_profile)
             await self._browser.close()
         super().close()
 
